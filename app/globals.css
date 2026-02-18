@@ -1,26 +1,456 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Основная церковная палитра */
+  --color-church-bg: #FCFAF7;
+  --color-church-gold: #C5A059;
+  --color-church-gold-light: #D4B87A;
+  --color-church-red: #762121;
+  --color-church-red-dark: #5A1818;
+  --color-church-text: #1F1F1F;
+
+  /* Расширенная палитра */
+  --color-parchment: #F5EFE0;
+  --color-parchment-dark: #E8DCCA;
+  --color-icon-blue: #2C4A6E;
+  --color-candle: #FFD700;
+  --color-incense: #8B7355;
+  --color-dark-wood: #3E2723;
+
+  /* Шрифты */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", "Playfair Display", ui-serif, Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== BASE ===== */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-church-bg);
+  color: var(--color-church-text);
+  font-family: var(--font-sans);
+}
+
+/* ===== KEYFRAME ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(197, 160, 89, 0.8));
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes cross-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.8s ease-out forwards;
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(197, 160, 89, 0.15) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* ===== ORNAMENT DIVIDERS ===== */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  opacity: 0.6;
+}
+
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  max-width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-church-gold), transparent);
+}
+
+/* ===== TIMELINE ===== */
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--color-church-gold), var(--color-church-gold), transparent);
+  transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .timeline-line {
+    left: 24px;
+  }
+}
+
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-church-gold);
+  border: 3px solid var(--color-church-bg);
+  box-shadow: 0 0 0 3px var(--color-church-gold), 0 0 12px rgba(197, 160, 89, 0.4);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 1.5rem;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .timeline-dot {
+    left: 24px;
+  }
+}
+
+/* ===== PARALLAX HERO ===== */
+.hero-parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-parallax::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+      rgba(30, 20, 10, 0.7) 0%,
+      rgba(30, 20, 10, 0.5) 40%,
+      rgba(30, 20, 10, 0.8) 100%);
+  z-index: 1;
+}
+
+/* ===== PARTICLES ===== */
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--color-church-gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-float linear infinite;
+  pointer-events: none;
+}
+
+/* ===== GLASS CARD ===== */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 1rem;
+}
+
+/* ===== SECTION STYLES ===== */
+.section-church {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-church::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-church-gold), transparent);
+  opacity: 0.3;
+}
+
+/* ===== SCHEDULE CARD ===== */
+.schedule-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.schedule-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-church-red), var(--color-church-gold));
+}
+
+.schedule-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(118, 33, 33, 0.1);
+}
+
+/* ===== WATER STREAM EFFECT ===== */
+.water-stream-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Individual water droplet */
+.water-drop {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 30%,
+      rgba(165, 210, 235, 0.7),
+      rgba(100, 180, 220, 0.4) 60%,
+      rgba(70, 150, 200, 0.1));
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+/* Animated splash particles */
+.water-splash {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(150, 210, 240, 0.6);
+  pointer-events: none;
+  opacity: 0;
+  animation: splash-float 4s ease-in-out infinite;
+}
+
+@keyframes splash-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+
+  20% {
+    opacity: 0.8;
+    transform: translate(var(--splash-dx, 15px), var(--splash-dy, -10px)) scale(1);
+  }
+
+  80% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--splash-dx, 15px) * 2), calc(var(--splash-dy, -10px) * 1.5)) scale(0.3);
+  }
+}
+
+/* Ripple rings */
+.water-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(150, 210, 240, 0.3);
+  pointer-events: none;
+  opacity: 0;
+  animation: ripple-expand 3s ease-out infinite;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Flowing stream path - SVG wave line */
+.water-stream-flow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.water-stream-flow path {
+  fill: none;
+  stroke: url(#waterGradient);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.3;
+  stroke-dasharray: 12 8;
+  animation: stream-flow 2s linear infinite;
+}
+
+@keyframes stream-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -40;
+  }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-church-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-church-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-church-red);
+}
+
+/* ===== SELECTION ===== */
+::selection {
+  background: rgba(197, 160, 89, 0.3);
+  color: var(--color-church-red);
 }

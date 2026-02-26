@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import AdminEditBtn from '@/components/AdminEditBtn';
 import { useRouter } from 'next/navigation';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 interface NewsItem {
   id: number;
@@ -20,7 +25,7 @@ export default function NewsDetail() {
   const { id } = useParams();
   const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState(0);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchOneNews() {
@@ -63,31 +68,51 @@ export default function NewsDetail() {
 
         {/* Photo gallery */}
         {allImages.length > 0 && (
-          <div className="mb-8">
-            {/* Main image */}
-            <div className="rounded-xl overflow-hidden max-h-[500px] mb-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={allImages[activeImage]}
-                alt={newsItem.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
+          <div className="mb-10 relative group">
+            {allImages.length === 1 ? (
+              <div
+                className="rounded-xl overflow-hidden bg-gray-50 cursor-pointer border border-gray-100"
+                onClick={() => setFullscreenImage(allImages[0])}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={allImages[0]}
+                  alt={newsItem.title}
+                  className="w-full h-auto max-h-[70vh] object-contain mx-auto"
+                />
+              </div>
+            ) : (
+              <div className="relative">
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  spaceBetween={10}
+                  slidesPerView={1}
+                  navigation={{
+                    nextEl: '.news-next',
+                    prevEl: '.news-prev',
+                  }}
+                  pagination={{ clickable: true }}
+                  className="rounded-xl border border-gray-100 bg-gray-50"
+                >
+                  {allImages.map((url, i) => (
+                    <SwiperSlide key={i} className="cursor-pointer" onClick={() => setFullscreenImage(url)}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt={`${newsItem.title} - фото ${i + 1}`}
+                        className="w-full h-auto max-h-[70vh] object-contain mx-auto"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
 
-            {/* Thumbnails (only if more than 1 image) */}
-            {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {allImages.map((url, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImage(i)}
-                    className={`shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition ${i === activeImage ? 'border-[#C5A059] shadow-md' : 'border-gray-200 opacity-60 hover:opacity-100'
-                      }`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt={`Фото ${i + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+                {/* Custom arrows */}
+                <button className="news-prev absolute top-1/2 -left-4 md:-left-6 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#762121] hover:bg-[#F5EFE0] transition -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </button>
+                <button className="news-next absolute top-1/2 -right-4 md:-right-6 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#762121] hover:bg-[#F5EFE0] transition -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </button>
               </div>
             )}
           </div>
@@ -101,6 +126,29 @@ export default function NewsDetail() {
           )}
         </div>
       </article>
+
+      {/* Fullscreen Modal */}
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 md:p-8"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <button
+            className="absolute top-6 right-6 text-white text-4xl hover:text-gray-300 transition z-50 cursor-pointer"
+            onClick={() => setFullscreenImage(null)}
+          >
+            ✕
+          </button>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={fullscreenImage}
+            alt="Полноэкранное фото"
+            className="max-w-full max-h-screen object-contain cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </main>
   );
 }

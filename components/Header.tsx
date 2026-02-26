@@ -44,8 +44,8 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
-          ? 'bg-[#FCFAF7]/95 backdrop-blur-lg shadow-lg shadow-black/5 border-b border-[#C5A059]/20'
-          : 'bg-transparent border-b border-transparent'
+        ? 'bg-[#FCFAF7]/95 backdrop-blur-lg shadow-lg shadow-black/5 border-b border-[#C5A059]/20'
+        : 'bg-transparent border-b border-transparent'
         }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -64,7 +64,7 @@ export default function Header() {
             {/* Средняя перекладина */}
             <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             {/* Нижняя (наклонная) */}
-            <line x1="7" y1="24" x2="17" y2="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <line x1="7" y1="20" x2="17" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
 
           <div className={`transition-colors duration-500 ${scrolled ? 'text-[#762121]' : 'text-white'}`}>
@@ -133,7 +133,7 @@ export default function Header() {
                 <line x1="7" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <line x1="12" y1="0" x2="12" y2="32" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <line x1="7" y1="24" x2="17" y2="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="7" y1="20" x2="17" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
 
               {menuItems.map((item, i) => (

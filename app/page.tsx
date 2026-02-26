@@ -307,12 +307,28 @@ const timelineData = [
     text: 'Храм является действующим приходом, объединяющим людей вокруг молитвы, Евхаристии и дел милосердия. Тысячи верующих ежегодно посещают святой источник.',
   },
 ];
-
-const scheduleData = [
-  { days: 'Понедельник — Пятница', time: '10:00 — 18:00', icon: '🕐' },
-  { days: 'Суббота', time: '10:00 — 20:00', icon: '🕑' },
-  { days: 'Воскресенье', time: '08:00 — 18:00', icon: '🕊️' },
+const DAYS_ORDER = [
+  'Будние дни',
+  'Понедельник',
+  'Вторник',
+  'Среда',
+  'Четверг',
+  'Пятница',
+  'Суббота',
+  'Воскресенье',
+  'Праздничные дни'
 ];
+
+interface ScheduleItem {
+  id: number;
+  day_of_week: string;
+  time: string;
+  event_title: string;
+  is_holiday: boolean;
+  event_date?: string;
+  image_url?: string;
+  updated_at?: string;
+}
 
 /* ═══════════════════════════════════════
    ГЛАВНАЯ СТРАНИЦА
@@ -320,13 +336,17 @@ const scheduleData = [
 
 export default function Home() {
   const [contacts, setContacts] = useState<any>(null);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
 
   useEffect(() => {
-    async function fetchContacts() {
-      const { data } = await supabase.from('contacts').select('*').single();
-      if (data) setContacts(data);
+    async function fetchData() {
+      const { data: contactsData } = await supabase.from('contacts').select('*').single();
+      if (contactsData) setContacts(contactsData);
+
+      const { data: schedData } = await supabase.from('schedule').select('*').order('time', { ascending: true });
+      if (schedData) setSchedule(schedData);
     }
-    fetchContacts();
+    fetchData();
   }, []);
 
   const heroRef = useRef(null);
@@ -607,16 +627,87 @@ export default function Home() {
             </h2>
           </AnimatedSection>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-            {scheduleData.map((item, i) => (
-              <AnimatedSection key={i} delay={i * 0.15}>
-                <div className="schedule-card text-center">
-                  <span className="text-3xl mb-3 block">{item.icon}</span>
-                  <h3 className="font-serif font-bold text-[#762121] text-lg mb-2">{item.days}</h3>
-                  <p className="text-2xl md:text-3xl font-serif font-bold text-[#C5A059]">{item.time}</p>
+          <div className="space-y-6 mb-10 bg-white/40 p-4 md:p-8 rounded-3xl border border-[#C5A059]/20 shadow-sm">
+            {schedule.length === 0 ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Fallback while loading or if empty */}
+                {[
+                  { days: 'Понедельник — Пятница', time: '10:00 — 18:00', icon: '🕐' },
+                  { days: 'Суббота', time: '10:00 — 20:00', icon: '🕑' },
+                  { days: 'Воскресенье', time: '08:00 — 18:00', icon: '🕊️' }
+                ].map((item, i) => (
+                  <AnimatedSection key={i} delay={i * 0.15}>
+                    <div className="schedule-card text-center h-full">
+                      <span className="text-3xl mb-3 block">{item.icon}</span>
+                      <h3 className="font-serif font-bold text-[#762121] text-lg mb-2">{item.days}</h3>
+                      <p className="text-2xl md:text-3xl font-serif font-bold text-[#C5A059]">{item.time}</p>
+                    </div>
+                  </AnimatedSection>
+                ))}
+              </div>
+            ) : (
+              <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-4">
+                  {DAYS_ORDER.map((dayName) => {
+                    const dayServices = schedule.filter(s => s.day_of_week === dayName);
+                    if (dayServices.length === 0) return null;
+
+                    return (
+                      <AnimatedSection key={dayName}>
+                        <div className="bg-white rounded-2xl shadow-sm border border-[#C5A059]/30 overflow-hidden text-left">
+                          <div className="bg-[#FCFAF7] px-5 py-3 border-b border-[#C5A059]/20">
+                            <h3 className="font-serif font-bold text-lg text-[#762121] uppercase tracking-wider">
+                              {dayName}
+                            </h3>
+                          </div>
+                          <div className="divide-y divide-gray-100">
+                            {dayServices.map((service) => (
+                              <div key={service.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                                <div className="flex items-center gap-4 md:gap-6">
+                                  <div className={`text-xl md:text-2xl font-serif font-bold ${service.is_holiday ? 'text-[#C5A059]' : 'text-[#762121]'}`}>
+                                    {service.time}
+                                  </div>
+                                  <div>
+                                    {service.event_date && (
+                                      <div className="text-[10px] md:text-xs font-bold text-[#C5A059] uppercase tracking-wider mb-0.5">
+                                        {new Date(service.event_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+                                      </div>
+                                    )}
+                                    <div className="font-medium text-sm md:text-base text-[#1F1F1F] leading-snug">
+                                      {service.event_title}
+                                    </div>
+                                    {service.is_holiday && (
+                                      <span className="text-[9px] md:text-[10px] text-white bg-[#C5A059] px-2 py-0.5 rounded-full mt-1 inline-block">
+                                        Праздник
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                {service.image_url && (
+                                  <div className="ml-3 shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden shadow-sm border border-gray-100 hidden sm:block">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={service.image_url} alt={service.event_title} className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </AnimatedSection>
+                    );
+                  })}
                 </div>
-              </AnimatedSection>
-            ))}
+              </div>
+            )}
+
+            <div className="text-center mt-8">
+              <Link href="/schedule" className="inline-flex items-center gap-2 px-8 py-3 bg-[#762121] text-white font-medium rounded-full hover:bg-[#C5A059] transition-all duration-300 shadow-md">
+                Полное расписание
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Церковная лавка */}

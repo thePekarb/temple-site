@@ -171,7 +171,7 @@ export default function History() {
               <line x1="7" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               <line x1="12" y1="0" x2="12" y2="32" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="7" y1="24" x2="17" y2="20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="7" y1="20" x2="17" y2="24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             <p className="text-lg md:text-xl font-serif italic text-gray-200 leading-relaxed">
               «Сегодня храм при святом источнике является действующим приходом,

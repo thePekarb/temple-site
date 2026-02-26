@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AdminEditBtn from '@/components/AdminEditBtn';
 import Modal from '@/components/Modal';
-import ImageUpload from '@/components/ImageUpload';
+import MultiImageUpload from '@/components/MultiImageUpload';
 
 interface NewsItem {
   id: number;
@@ -13,6 +13,7 @@ interface NewsItem {
   description: string;
   content: string;
   image_url: string;
+  image_urls?: string[];
   published_date: string;
 }
 
@@ -36,6 +37,7 @@ export default function NewsPage() {
     description: '',
     content: '',
     image_url: '',
+    image_urls: [] as string[],
     published_date: '',
   });
 
@@ -82,6 +84,7 @@ export default function NewsPage() {
         description: item.description || '',
         content: item.content || '',
         image_url: item.image_url || '',
+        image_urls: item.image_urls || (item.image_url ? [item.image_url] : []),
         published_date: item.published_date,
       });
     } else {
@@ -91,6 +94,7 @@ export default function NewsPage() {
         description: '',
         content: '',
         image_url: '',
+        image_urls: [],
         published_date: new Date().toLocaleDateString('ru-RU'),
       });
     }
@@ -100,7 +104,10 @@ export default function NewsPage() {
   // Сохранение
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...formData };
+    const payload = {
+      ...formData,
+      image_url: formData.image_urls.length > 0 ? formData.image_urls[0] : formData.image_url,
+    };
 
     let error;
     if (editingItem) {
@@ -159,12 +166,23 @@ export default function NewsPage() {
 
             <Link href={`/news/${item.id}`} className="block h-full flex flex-col">
               <div className="relative h-56 bg-gray-100 shrink-0">
-                {item.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.image_url} alt={item.title} className="object-cover w-full h-full" />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400">Нет фото</div>
-                )}
+                {(() => {
+                  const coverUrl = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : item.image_url;
+                  const photoCount = item.image_urls ? item.image_urls.length : (item.image_url ? 1 : 0);
+                  return coverUrl ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={coverUrl} alt={item.title} className="object-cover w-full h-full" />
+                      {photoCount > 1 && (
+                        <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                          📷 {photoCount}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400">Нет фото</div>
+                  );
+                })()}
               </div>
 
               <div className="p-6 flex flex-col flex-grow">
@@ -198,8 +216,8 @@ export default function NewsPage() {
               key={page}
               onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`w-10 h-10 rounded-lg font-serif font-bold text-sm transition-all duration-300 ${page === currentPage
-                  ? 'bg-[#762121] text-white shadow-md shadow-[#762121]/20'
-                  : 'border border-[#C5A059]/30 text-[#762121] hover:bg-[#C5A059]/10'
+                ? 'bg-[#762121] text-white shadow-md shadow-[#762121]/20'
+                : 'border border-[#C5A059]/30 text-[#762121] hover:bg-[#C5A059]/10'
                 }`}
             >
               {page}
@@ -245,11 +263,11 @@ export default function NewsPage() {
           </div>
 
           <div>
-            {/* ВСТАВЛЯЕМ НАШ ЗАГРУЗЧИК ФОТО */}
-            <label className="block text-sm font-medium text-gray-700 mb-2">Фотография</label>
-            <ImageUpload
-              value={formData.image_url}
-              onChange={(url) => setFormData({ ...formData, image_url: url })}
+            <label className="block text-sm font-medium text-gray-700 mb-2">Фотографии (до 5)</label>
+            <MultiImageUpload
+              values={formData.image_urls}
+              onChange={(urls) => setFormData({ ...formData, image_urls: urls })}
+              max={5}
             />
           </div>
 

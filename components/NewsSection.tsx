@@ -12,6 +12,7 @@ interface NewsItem {
   title: string;
   description: string;
   image_url: string;
+  image_urls?: string[];
   published_date: string;
 }
 
@@ -66,12 +67,23 @@ export default function NewsSection() {
             <SwiperSlide key={item.id} className="h-auto pb-2">
               <Link href={`/news/${item.id}`} className="group/card cursor-pointer flex flex-col h-full bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition duration-300">
                 <div className="relative h-56 bg-gray-100 overflow-hidden">
-                  {item.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.image_url} alt={item.title} className="object-cover w-full h-full transform group-hover/card:scale-105 transition duration-700" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">Нет фото</div>
-                  )}
+                  {(() => {
+                    const coverUrl = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : item.image_url;
+                    const photoCount = item.image_urls ? item.image_urls.length : (item.image_url ? 1 : 0);
+                    return coverUrl ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={coverUrl} alt={item.title} className="object-cover w-full h-full transform group-hover/card:scale-105 transition duration-700" />
+                        {photoCount > 1 && (
+                          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-10">
+                            📷 {photoCount}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">Нет фото</div>
+                    );
+                  })()}
                 </div>
                 <div className="p-6 flex flex-col flex-grow">
                   <time className="text-xs font-bold text-[#C5A059] uppercase tracking-widest mb-2 block">{item.published_date}</time>

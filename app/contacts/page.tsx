@@ -84,9 +84,10 @@ export default function ContactsPage() {
                 <p className="text-xl font-serif font-bold text-[#1F1F1F] mt-3">
                   Иеромонах Николай (Дранников)
                 </p>
+                <p className="text-sm text-gray-500 mt-4 mb-1 font-medium">📞 Телефон для справок:</p>
                 <a
                   href="tel:+79093876432"
-                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#762121] text-white rounded-full hover:bg-[#C5A059] transition-all text-sm font-medium"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#762121] text-white rounded-full hover:bg-[#C5A059] transition-all text-sm font-medium"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />

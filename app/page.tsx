@@ -1,9 +1,10 @@
 'use client';
 import { motion, useInView, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
-import { useRef, useMemo, useState, useCallback } from 'react';
+import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import NewsSection from '@/components/NewsSection';
 import GuideMap from '@/components/GuideMap';
+import { supabase } from '@/utils/supabase';
 
 /* ═══════════════════════════════════════
    ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ
@@ -318,6 +319,16 @@ const scheduleData = [
    ═══════════════════════════════════════ */
 
 export default function Home() {
+  const [contacts, setContacts] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchContacts() {
+      const { data } = await supabase.from('contacts').select('*').single();
+      if (data) setContacts(data);
+    }
+    fetchContacts();
+  }, []);
+
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -635,14 +646,19 @@ export default function Home() {
               <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-[#C5A059]/10 to-transparent" />
 
               <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
-                {/* Аватар-заглушка */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-[#762121] to-[#5A1818] flex items-center justify-center shrink-0 shadow-lg">
-                  <svg width="48" height="64" viewBox="0 0 24 32" fill="none" className="text-[#C5A059]">
-                    <line x1="7" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="12" y1="0" x2="12" y2="32" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <line x1="7" y1="24" x2="17" y2="20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                {/* Фото настоятеля */}
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-[#762121] to-[#5A1818] flex items-center justify-center shrink-0 shadow-lg border-4 border-white overflow-hidden">
+                  {contacts?.priest_photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={contacts.priest_photo_url} alt="Настоятель" className="w-full h-full object-cover" />
+                  ) : (
+                    <svg width="48" height="64" viewBox="0 0 24 32" fill="none" className="text-[#C5A059]">
+                      <line x1="7" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="12" y1="0" x2="12" y2="32" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="7" y1="24" x2="17" y2="20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </div>
 
                 <div className="text-center md:text-left">
@@ -659,13 +675,13 @@ export default function Home() {
                     <p className="text-sm text-gray-500 mb-2 font-medium">📞 Телефон для справок:</p>
                     <div className="flex flex-col sm:flex-row items-center gap-4">
                       <a
-                        href="tel:+79093876432"
+                        href={`tel:${contacts?.priest_phone || '+79093876432'}`}
                         className="inline-flex items-center gap-3 px-6 py-3 bg-[#762121] text-white rounded-full hover:bg-[#C5A059] transition-all duration-300 shadow-md hover:-translate-y-0.5"
                       >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
                         </svg>
-                        +7 909 387-64-32
+                        {contacts?.priest_phone || '+7 909 387-64-32'}
                       </a>
                     </div>
                   </div>

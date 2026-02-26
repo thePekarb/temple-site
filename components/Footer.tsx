@@ -65,9 +65,6 @@ export default function Footer() {
                             <div>
                                 <p className="text-gray-500 text-xs uppercase tracking-widest mb-1">Настоятель храма</p>
                                 <p className="text-gray-300">Иеромонах Николай (Дранников)</p>
-                                <a href="tel:+79093876432" className="text-[#C5A059] hover:text-[#D4B87A] transition mt-1 inline-block">
-                                    +7 909 387-64-32
-                                </a>
                             </div>
                         </div>
                     </div>
